@@ -1,0 +1,19 @@
+server:
+  port: '10480'
+spring:
+  application:
+    name: demo
+  datasource:
+    username: postgres
+    url: jdbc:postgresql://localhost:5432/teacher_service
+    password: qwerty123
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+logging:
+  level:
+    web: DEBUG
+jwt:
+  secret: jdsokanfh01827ehf3whhf5nghmcnj2ghn178ooxmnsjah318oslgjmclsjghncl71jsng
+  lifetime: 1m
