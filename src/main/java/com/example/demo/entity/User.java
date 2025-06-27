@@ -2,14 +2,14 @@ package com.example.demo.entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.util.List;
 
 @Entity
 @Table(name = "users")
 @Getter
 @Setter
-@NoArgsConstructor
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -21,8 +21,9 @@ public class User {
     @Column(nullable = false)
     private String password;
 
-    public User(String username, String password) {
-        this.username = username;
-        this.password = password;
-    }
+    @Column(nullable = false)
+    private int hash;
+
+    @OneToMany(mappedBy = "user")
+    private List<File> files;
 }

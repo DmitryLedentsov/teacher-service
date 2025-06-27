@@ -3,6 +3,7 @@ package com.example.demo.service.impl;
 import com.example.demo.dto.AuthDto;
 import com.example.demo.entity.User;
 import com.example.demo.exception.EntityAlreadyExistsException;
+import com.example.demo.exception.EntityNotFoundException;
 import com.example.demo.repo.UserRepository;
 import com.example.demo.security.UserPrincipal;
 import com.example.demo.service.UserService;
@@ -32,14 +33,20 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         validate(authDto);
 
         // TODO потом добавить MapStruct
-        var user = new User(
-                authDto.username(),
-                passwordEncoder.encode(authDto.password())
-        );
+        var user = new User();
+        user.setUsername(authDto.username());
+        user.setPassword(passwordEncoder.encode(authDto.password()));
+        user.setHash(authDto.username().hashCode());
 
         userRepository.save(user);
 
         return new UserPrincipal(user);
+    }
+
+    @Override
+    public User getByUsername(String username) {
+        return userRepository.findByUsername(username)
+                .orElseThrow(() -> new EntityNotFoundException("Пользователь с указанным именем не существует"));
     }
 
     private void validate(AuthDto authDto) {

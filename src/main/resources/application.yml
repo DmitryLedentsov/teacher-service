@@ -11,9 +11,14 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: true
+  servlet:
+    multipart:
+      max-file-size: 20MB # TODO
+      max-request-size: 20MB # TODO
 logging:
   level:
     web: DEBUG
 jwt:
   secret: jdsokanfh01827ehf3whhf5nghmcnj2ghn178ooxmnsjah318oslgjmclsjghncl71jsng
-  lifetime: 1m
+  lifetime: 1h
+user-files-dir: user-files
