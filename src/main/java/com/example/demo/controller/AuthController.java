@@ -22,7 +22,7 @@ public class AuthController {
     }
 
     @PostMapping("/sign-in")
-    public TokenDto signIn(@RequestBody AuthDto authDto) {
+    public TokenDto signIn(@RequestBody @Valid AuthDto authDto) {
         return authService.signIn(authDto);
     }
 }
