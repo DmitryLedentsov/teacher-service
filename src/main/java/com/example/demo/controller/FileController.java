@@ -12,6 +12,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.security.Principal;
 
+// TODO не нужен, т.к. обработка идет в другом сервисе?
 @RestController
 @RequestMapping("/files")
 @RequiredArgsConstructor

@@ -11,4 +11,5 @@ public class FileDto {
     private long size;
     private String link;
     private Instant uploadedAt;
+    private Long userId;
 }

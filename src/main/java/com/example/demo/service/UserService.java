@@ -8,4 +8,6 @@ public interface UserService {
     UserPrincipal createPrincipal(AuthDto authDto);
 
     User getByUsername(String username);
+
+    Long getIdByUsername(String username);
 }

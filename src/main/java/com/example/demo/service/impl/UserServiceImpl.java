@@ -49,6 +49,11 @@ public class UserServiceImpl implements UserService, UserDetailsService {
                 .orElseThrow(() -> new EntityNotFoundException("Пользователь с указанным именем не существует"));
     }
 
+    @Override
+    public Long getIdByUsername(String username) {
+        return getByUsername(username).getId();
+    }
+
     private void validate(AuthDto authDto) {
         if (userRepository.existsByUsername(authDto.username()))
             throw new EntityAlreadyExistsException(ValidationUtils.USERNAME_TAKEN);

@@ -22,3 +22,4 @@ jwt:
   secret: jdsokanfh01827ehf3whhf5nghmcnj2ghn178ooxmnsjah318oslgjmclsjghncl71jsng
   lifetime: 1h
 user-files-dir: user-files
+external-api-url: http://localhost:10481/

@@ -161,14 +161,15 @@ public class FileServiceImpl implements FileService {
         return new PathResource(filePath);
     }
 
-    // TODO MapStruct
+    // TODO MapStruct и определиться, что передавать
     private FileDto toDto(File fileEntity) {
         var fileDto = new FileDto();
         fileDto.setId(fileEntity.getId());
-        fileDto.setLink(fileEntity.getName());
+        fileDto.setLink(fileEntity.getPath());
         fileDto.setSize(fileEntity.getSize());
         fileDto.setName(fileEntity.getName());
         fileDto.setUploadedAt(fileEntity.getUploadedAt());
+        fileDto.setUserId(fileEntity.getUser().getId());
         return fileDto;
     }
 }
