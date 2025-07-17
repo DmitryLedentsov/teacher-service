@@ -7,6 +7,7 @@ import com.example.demo.service.FileService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -22,7 +23,7 @@ public class FileController {
     private final FileService fileService;
     private final ExternalApiService externalApiService;
 
-    @PostMapping("/{id}/files")
+    @PostMapping(value = "/{id}/files", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ProcessResponseDto uploadFileAndStartProcessing(
             Principal principal,
             @PathVariable("id") Long subjectId,
@@ -46,7 +47,8 @@ public class FileController {
         return files;
     }
 
-    @GetMapping("/{id}/files/{name}")
+    // TODO produces не нужен? (устанавливал для swagger)
+    @GetMapping(value = "/{id}/files/{name}", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     public ResponseEntity<Resource> downloadFile(
             Principal principal,
             @PathVariable("id") Long subjectId,

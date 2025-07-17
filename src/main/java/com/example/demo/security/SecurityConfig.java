@@ -26,6 +26,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(c -> c
                         .requestMatchers("/auth/**").permitAll()
                         .requestMatchers("/error").permitAll() // для исключений
+                        .requestMatchers("/swagger-ui/**", "/swagger-resources/**", "/v3/api-docs/**", "/v3/api-docs.yaml").permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(c -> c
