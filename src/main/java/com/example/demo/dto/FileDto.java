@@ -14,6 +14,7 @@ public class FileDto {
     private String url;
 
     // TODO сделать получше? эти поля нужны для стороннего сервиса
+    @JsonIgnore
     private String folderPath;
     @JsonIgnore
     private Long userId;
