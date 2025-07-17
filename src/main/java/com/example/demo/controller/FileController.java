@@ -19,7 +19,7 @@ import java.security.Principal;
 public class FileController {
     private final FileService fileService;
 
-    @PostMapping
+    // @PostMapping
     public FileDto save(Principal principal, @RequestParam MultipartFile file) {
         var fileDto = fileService.save(principal.getName(), file);
         fileDto.setLink(getFileUrl(fileDto.getLink()));

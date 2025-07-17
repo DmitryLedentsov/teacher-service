@@ -1,14 +1,15 @@
 package com.example.demo.service.impl;
 
-import com.example.demo.dto.external.*;
+import com.example.demo.dto.external.ProcessRequestDto;
+import com.example.demo.dto.external.ProcessResponseDto;
+import com.example.demo.dto.external.SearchRequestDto;
+import com.example.demo.dto.external.SearchResponseDto;
+import com.example.demo.dto.external.TaskStatusResponseDto;
 import com.example.demo.service.ExternalApiService;
-import com.fasterxml.jackson.databind.JsonNode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
-
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -17,14 +18,14 @@ public class ExternalApiServiceImpl implements ExternalApiService {
     private final RestClient restClient;
 
     @Override
-    public FileProcessResponseDto startFileProcessing(String user, String filePath) {
-        log.info("Запуск обработки файла {} пользователя {}", filePath, user);
+    public ProcessResponseDto startProcessing(String user, String subject, String folderPath) {
+        log.info("Запуск обработки папки {} пользователя {}", folderPath, user);
         return restClient
                 .post()
-                .uri("/process")
-                .body(new FileProcessRequestDto(filePath, "structure", user))
+                .uri("/process-folder")
+                .body(new ProcessRequestDto(user, subject, folderPath))
                 .retrieve()
-                .body(FileProcessResponseDto.class);
+                .body(ProcessResponseDto.class);
     }
 
     @Override
@@ -32,11 +33,23 @@ public class ExternalApiServiceImpl implements ExternalApiService {
         log.info("Получение статуса задачи {}", taskId);
         return restClient
                 .get()
-                .uri(uriBuilder -> uriBuilder.path("/status/{task_id}").build(taskId))
+                .uri(uriBuilder -> uriBuilder.path("/task-status/{task_id}").build(taskId))
                 .retrieve()
                 .body(TaskStatusResponseDto.class);
     }
 
+    @Override
+    public SearchResponseDto search(String user, String subject, String query) {
+        log.info("Поиск по материалам по запросу {} (пользователь: {})", query, user);
+        return restClient
+                .post()
+                .uri("/search")
+                .body(new SearchRequestDto(user, subject, query))
+                .retrieve()
+                .body(SearchResponseDto.class);
+    }
+
+    /*
     @Override
     public UserFilesResponseDto getUserFiles(String user, String taskId, boolean includeDownloadUrls) {
         log.info("Получение списка файлов пользователя {} (taskId: {}, includeDownloadUrls: {})",
@@ -82,17 +95,6 @@ public class ExternalApiServiceImpl implements ExternalApiService {
     }
 
     @Override
-    public SearchResponseDto search(String user, String query) {
-        log.info("Семантический поиск по запросу {} (пользователь: {})", query, user);
-        return restClient
-                .post()
-                .uri("/rag/query")
-                .body(new SearchRequestDto(user, query))
-                .retrieve()
-                .body(SearchResponseDto.class);
-    }
-
-    @Override
     public TaskFilesDeletionResponseDto deleteTaskFiles(String user, String taskId) {
         log.info("Удаление файлов задачи {} пользователя {}", taskId, user);
         return restClient
@@ -104,4 +106,5 @@ public class ExternalApiServiceImpl implements ExternalApiService {
                 .retrieve()
                 .body(TaskFilesDeletionResponseDto.class);
     }
+     */
 }

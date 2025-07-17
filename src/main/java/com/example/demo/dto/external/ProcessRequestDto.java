@@ -4,7 +4,9 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public record TaskFilesDeletionResponseDto(
-        String message
+public record ProcessRequestDto(
+        String userId,
+        String subject,
+        String folderPath
 ) {
 }

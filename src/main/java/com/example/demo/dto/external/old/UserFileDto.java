@@ -1,15 +1,16 @@
-package com.example.demo.dto.external;
+package com.example.demo.dto.external.old;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public record FileContentResponseDto(
+public record UserFileDto(
         String objectKey,
         String filename,
-        String content,
+        int size,
+        String lastModified,
+        String downloadUrl,
         JsonNode metadata
 ) {
 }
-
