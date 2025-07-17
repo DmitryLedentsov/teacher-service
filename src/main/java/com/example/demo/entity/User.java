@@ -26,4 +26,7 @@ public class User {
 
     @OneToMany(mappedBy = "user")
     private List<File> files;
+
+    @OneToMany(mappedBy = "user")
+    private List<Subject> subjects;
 }
