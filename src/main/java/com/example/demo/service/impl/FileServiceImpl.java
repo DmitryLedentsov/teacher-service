@@ -2,12 +2,15 @@ package com.example.demo.service.impl;
 
 import com.example.demo.dto.FileDto;
 import com.example.demo.entity.File;
+import com.example.demo.entity.Subject;
 import com.example.demo.entity.User;
 import com.example.demo.exception.EntityNotFoundException;
 import com.example.demo.exception.FileStorageException;
 import com.example.demo.exception.FileUploadException;
+import com.example.demo.mapper.FileMapper;
 import com.example.demo.repo.FileRepository;
 import com.example.demo.service.FileService;
+import com.example.demo.service.SubjectService;
 import com.example.demo.service.UserService;
 import com.example.demo.util.FileContainer;
 import lombok.extern.slf4j.Slf4j;
@@ -22,14 +25,16 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.time.Instant;
+import java.util.List;
 import java.util.Set;
 
 @Service
 @Slf4j
 public class FileServiceImpl implements FileService {
     private final FileRepository fileRepository;
+    private final FileMapper fileMapper;
     private final UserService userService;
+    private final SubjectService subjectService;
 
     private final Path baseUploadPath;
 
@@ -44,53 +49,64 @@ public class FileServiceImpl implements FileService {
 
     public FileServiceImpl(
             FileRepository fileRepository,
+            FileMapper fileMapper,
             UserService userService,
+            SubjectService subjectService,
             @Value("${user-files-dir}") String baseUploadDir
     ) {
         this.fileRepository = fileRepository;
+        this.fileMapper = fileMapper;
         this.userService = userService;
+        this.subjectService = subjectService;
         this.baseUploadPath = Path.of(baseUploadDir);
     }
 
     @Override
-    public FileDto save(String username, MultipartFile uploadFile) {
+    public FileDto uploadFile(String username, Long subjectId, MultipartFile uploadFile) {
         validate(uploadFile);
 
-        var user = userService.getByUsername(username);
-        var filePath = saveToFileSystem(user, uploadFile);
-        var fileEntity = saveToDatabase(user, uploadFile, filePath);
+        // TODO можно убрать лишний запрос?
+        var user = userService.findByUsername(username);
+        var subject = subjectService.findByUsernameAndId(username, subjectId);
 
-        return toDto(fileEntity);
+        var filePath = saveToFileSystem(user, subject, uploadFile);
+        var fileEntity = saveToDatabase(user, subject, uploadFile, filePath);
+
+        return fileMapper.toDto(fileEntity);
     }
 
     @Override
-    public FileContainer load(String username, String filename) {
-        var file = fileRepository.findByNameAndUser_Username(filename, username)
-                .orElseThrow(() -> new EntityNotFoundException("Файл %s не найден".formatted(filename)));
+    public FileContainer downloadFile(String username, Long subjectId, String filename) {
+        var file = loadFromDatabase(username, subjectId, filename);
 
-        var fileResource = loadFromFileSystem(file.getPath());
+        var fileResource = loadFromFileSystem(file.getFolderPath(), file.getName());
         var fileType = MediaType.parseMediaType(file.getContentType());
 
         return new FileContainer(fileResource, fileType);
     }
 
-    private File saveToDatabase(User user, MultipartFile uploadFile, Path filePath) {
-        var file = new File();
-        file.setSize(uploadFile.getSize());
-        file.setContentType(uploadFile.getContentType());
-        file.setOriginalName(uploadFile.getOriginalFilename());
-        file.setUploadedAt(Instant.now());
-        file.setUser(user);
+    @Override
+    public List<FileDto> getAllForUserSubject(String username, Long subjectId) {
+        var files = fileRepository.findAllBySubject_IdAndUser_Username(subjectId, username);
+        return fileMapper.toDtoList(files);
+    }
+
+    private File saveToDatabase(User user, Subject subject, MultipartFile uploadFile, Path filePath) {
+        var file = fileMapper.toEntity(user, subject, uploadFile);
         file.setName(getFileName(filePath));
-        file.setPath(getFileRelativePath(filePath).toString());
+        file.setFolderPath(getFolderPath(filePath));
         return fileRepository.save(file);
     }
 
-    private Path saveToFileSystem(User user, MultipartFile uploadFile) {
+    private String getFolderPath(Path filePath) {
+        return getRelativeFilePath(filePath).getParent().toString().replace("\\", "/");
+    }
+
+    private Path saveToFileSystem(User user, Subject subject, MultipartFile uploadFile) {
         try {
-            var userDir = createAndGetUserDirPath(user);
+            var directory = createAndGetDirectory(user, subject);
             var fileName = uploadFile.getOriginalFilename();
-            var filePath = getFilePath(userDir, fileName);
+            var filePath = getFilePath(directory, fileName);
             Files.write(filePath, uploadFile.getBytes());
             log.info("Файл сохранён: {}", filePath);
             return filePath;
@@ -113,12 +129,13 @@ public class FileServiceImpl implements FileService {
         return filePath;
     }
 
-    private Path createAndGetUserDirPath(User user) {
+    private Path createAndGetDirectory(User user, Subject subject) {
         try {
             var userDirName = getUserDirName(user);
-            var userDirPath = baseUploadPath.resolve(userDirName);
-            Files.createDirectories(userDirPath);
-            return userDirPath;
+            var subjectDirName = getSubjectDirName(subject);
+            var path = baseUploadPath.resolve(userDirName).resolve(subjectDirName);
+            Files.createDirectories(path);
+            return path;
         } catch (IOException e) {
             throw new FileStorageException("Ошибка при создании директории");
         }
@@ -128,7 +145,11 @@ public class FileServiceImpl implements FileService {
         return String.valueOf(user.getHash());
     }
 
-    private Path getFileRelativePath(Path filePath) {
+    private String getSubjectDirName(Subject subject) {
+        return subject.getName();
+    }
+
+    private Path getRelativeFilePath(Path filePath) {
         return baseUploadPath.relativize(filePath);
     }
 
@@ -150,26 +171,19 @@ public class FileServiceImpl implements FileService {
         }
     }
 
-    private Resource loadFromFileSystem(String path) {
-        var filePath = baseUploadPath.resolve(path);
+    private File loadFromDatabase(String username, Long subjectId, String filename) {
+        return fileRepository.findByNameAndSubject_IdAndUser_Username(filename, subjectId, username)
+                .orElseThrow(() -> new EntityNotFoundException("Файл %s не найден".formatted(filename)));
+    }
 
-        if (!Files.exists(filePath)) {
+    private Resource loadFromFileSystem(String folderPath, String fileName) {
+        var filePath = baseUploadPath.resolve(folderPath).resolve(fileName);
+
+        if (!Files.exists(filePath) || Files.isDirectory(filePath)) {
             // в БД есть, в файловой системе нет
             throw new FileStorageException("Ошибка при загрузке файла");
         }
 
         return new PathResource(filePath);
-    }
-
-    // TODO MapStruct и определиться, что передавать
-    private FileDto toDto(File fileEntity) {
-        var fileDto = new FileDto();
-        fileDto.setId(fileEntity.getId());
-        fileDto.setLink(fileEntity.getPath());
-        fileDto.setSize(fileEntity.getSize());
-        fileDto.setName(fileEntity.getName());
-        fileDto.setUploadedAt(fileEntity.getUploadedAt());
-        fileDto.setUserId(fileEntity.getUser().getId());
-        return fileDto;
     }
 }

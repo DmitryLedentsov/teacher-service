@@ -27,8 +27,8 @@ public class File {
 
     private long size;
 
-    @Column(nullable = false, unique = true)
-    private String path;
+    @Column(nullable = false)
+    private String folderPath;
 
     @Column(nullable = false)
     private Instant uploadedAt;
@@ -36,4 +36,8 @@ public class File {
     @ManyToOne
     @JoinColumn(nullable = false)
     private User user;
+
+    @ManyToOne
+    @JoinColumn(nullable = false)
+    private Subject subject;
 }

@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.List;
+
 @Entity
 @Table(
         uniqueConstraints = {
@@ -20,10 +22,10 @@ public class Subject {
     @Column(nullable = false)
     private String name;
 
-    // @Column(unique = true, nullable = false)
-    // private String folderPath;
-
     @ManyToOne
     @JoinColumn(nullable = false)
     private User user;
+
+    @OneToMany(mappedBy = "subject")
+    private List<File> files;
 }

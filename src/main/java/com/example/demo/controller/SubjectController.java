@@ -20,23 +20,26 @@ public class SubjectController {
     private final SubjectService subjectService;
 
     @PostMapping
-    public ResponseEntity<SubjectDto> create(Principal principal, @RequestBody @Valid SubjectCreationDto subjectCreationDto) {
-        var subjectDto = subjectService.create(principal.getName(), subjectCreationDto);
-        var uri = createURI(subjectDto.id());
-        return ResponseEntity.created(uri).body(subjectDto);
+    public ResponseEntity<SubjectDto> create(
+            Principal principal,
+            @RequestBody @Valid SubjectCreationDto subjectCreation
+    ) {
+        var subject = subjectService.create(principal.getName(), subjectCreation);
+        var uri = createSubjectURI(subject.id());
+        return ResponseEntity.created(uri).body(subject);
     }
 
     @GetMapping
     public List<SubjectDto> getAll(Principal principal) {
-        return subjectService.getAll(principal.getName());
+        return subjectService.getAllByUsername(principal.getName());
     }
 
     @GetMapping("/{id}")
     public SubjectDto get(Principal principal, @PathVariable Long id) {
-        return subjectService.getById(principal.getName(), id);
+        return subjectService.getByUsernameAndId(principal.getName(), id);
     }
 
-    private URI createURI(Number id) {
+    private URI createSubjectURI(Long id) {
         return ServletUriComponentsBuilder
                 .fromCurrentRequest()
                 .path("/{id}")
