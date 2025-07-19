@@ -4,6 +4,7 @@ import com.example.demo.dto.FileDto;
 import com.example.demo.dto.external.ProcessResponseDto;
 import com.example.demo.service.ExternalApiService;
 import com.example.demo.service.FileService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
@@ -18,6 +19,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/subject")
+@SecurityRequirement(name = "bearer-token")
 @RequiredArgsConstructor
 public class FileController {
     private final FileService fileService;

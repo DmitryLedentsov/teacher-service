@@ -3,6 +3,7 @@ package com.example.demo.controller;
 import com.example.demo.dto.SubjectCreationDto;
 import com.example.demo.dto.SubjectDto;
 import com.example.demo.service.SubjectService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +16,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/subjects")
+@SecurityRequirement(name = "bearer-token")
 @RequiredArgsConstructor
 public class SubjectController {
     private final SubjectService subjectService;
