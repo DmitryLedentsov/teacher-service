@@ -18,7 +18,7 @@ import java.security.Principal;
 import java.util.List;
 
 @RestController
-@RequestMapping("/subject")
+@RequestMapping("/subjects")
 @SecurityRequirement(name = "bearer-token")
 @RequiredArgsConstructor
 public class FileController {
