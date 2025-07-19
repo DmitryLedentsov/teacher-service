@@ -1,10 +1,6 @@
 package com.example.demo.service.impl;
 
-import com.example.demo.dto.external.ProcessRequestDto;
-import com.example.demo.dto.external.ProcessResponseDto;
-import com.example.demo.dto.external.SearchRequestDto;
-import com.example.demo.dto.external.SearchResponseDto;
-import com.example.demo.dto.external.TaskStatusResponseDto;
+import com.example.demo.dto.external.*;
 import com.example.demo.service.ExternalApiService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
