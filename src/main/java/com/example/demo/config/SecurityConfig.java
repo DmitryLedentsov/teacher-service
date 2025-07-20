@@ -1,5 +1,6 @@
-package com.example.demo.security;
+package com.example.demo.config;
 
+import com.example.demo.security.JwtFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -26,6 +27,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(c -> c
                         .requestMatchers("/auth/**").permitAll()
                         .requestMatchers("/error").permitAll() // для исключений
+                        .requestMatchers("/swagger-ui/**", "/swagger-resources/**", "/v3/api-docs/**", "/v3/api-docs.yaml").permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(c -> c

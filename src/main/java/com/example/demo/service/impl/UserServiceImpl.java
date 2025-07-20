@@ -44,14 +44,9 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
-    public User getByUsername(String username) {
+    public User findByUsername(String username) {
         return userRepository.findByUsername(username)
                 .orElseThrow(() -> new EntityNotFoundException("Пользователь с указанным именем не существует"));
-    }
-
-    @Override
-    public Long getIdByUsername(String username) {
-        return getByUsername(username).getId();
     }
 
     private void validate(AuthDto authDto) {

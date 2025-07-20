@@ -18,6 +18,8 @@ spring:
 logging:
   level:
     web: DEBUG
+springdoc:
+  default-produces-media-type: application/json
 jwt:
   secret: jdsokanfh01827ehf3whhf5nghmcnj2ghn178ooxmnsjah318oslgjmclsjghncl71jsng
   lifetime: 1h

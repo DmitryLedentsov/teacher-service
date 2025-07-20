@@ -4,8 +4,12 @@ import com.example.demo.dto.FileDto;
 import com.example.demo.util.FileContainer;
 import org.springframework.web.multipart.MultipartFile;
 
-public interface FileService {
-    FileDto save(String username, MultipartFile file);
+import java.util.List;
 
-    FileContainer load(String username, String filename);
+public interface FileService {
+    FileDto uploadFile(String username, Long subjectId, MultipartFile file);
+
+    FileContainer downloadFile(String username, Long subjectId, String filename);
+
+    List<FileDto> getAllForUserSubject(String username, Long subjectId);
 }

@@ -7,26 +7,25 @@ import lombok.Setter;
 import java.util.List;
 
 @Entity
-@Table(name = "users")
+@Table(
+        uniqueConstraints = {
+                @UniqueConstraint(columnNames = {"name", "user_id"})
+        }
+)
 @Getter
 @Setter
-public class User {
+public class Subject {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(unique = true, nullable = false)
-    private String username;
-
     @Column(nullable = false)
-    private String password;
+    private String name;
 
-    @Column(nullable = false)
-    private int hash;
+    @ManyToOne
+    @JoinColumn(nullable = false)
+    private User user;
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "subject")
     private List<File> files;
-
-    @OneToMany(mappedBy = "user")
-    private List<Subject> subjects;
 }
